@@ -1,14 +1,10 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 ##Loading and preprocessing the data
 
 First, I set me working directory and upload the csv file to R stored as 'data'
 
-```{r, echo=TRUE}
+
+```r
 setwd("~/Documents/Coursera/RepData_PeerAssessment1")
 data <- read.csv("activity.csv", header = TRUE)
 ```
@@ -18,7 +14,8 @@ For this step I first had to remove the missing data. I stored this value to a n
 
 For ease of writting I seperated Steps, Date, and Interval into their own objects 
 
-```{r, echo=TRUE}
+
+```r
 clean<- na.omit(data)
 steps <- clean$steps
 date <- clean$date
@@ -26,27 +23,69 @@ interval <- clean$interval
 ```
 
 To find the total number of steps per day, I used the tapply function to sum the number of steps across each day 
-```{r, echo=TRUE}
+
+```r
 steps_per_day<-tapply(steps, date, sum)
 steps_per_day
 ```
 
+```
+## 2012-10-01 2012-10-02 2012-10-03 2012-10-04 2012-10-05 2012-10-06 
+##         NA        126      11352      12116      13294      15420 
+## 2012-10-07 2012-10-08 2012-10-09 2012-10-10 2012-10-11 2012-10-12 
+##      11015         NA      12811       9900      10304      17382 
+## 2012-10-13 2012-10-14 2012-10-15 2012-10-16 2012-10-17 2012-10-18 
+##      12426      15098      10139      15084      13452      10056 
+## 2012-10-19 2012-10-20 2012-10-21 2012-10-22 2012-10-23 2012-10-24 
+##      11829      10395       8821      13460       8918       8355 
+## 2012-10-25 2012-10-26 2012-10-27 2012-10-28 2012-10-29 2012-10-30 
+##       2492       6778      10119      11458       5018       9819 
+## 2012-10-31 2012-11-01 2012-11-02 2012-11-03 2012-11-04 2012-11-05 
+##      15414         NA      10600      10571         NA      10439 
+## 2012-11-06 2012-11-07 2012-11-08 2012-11-09 2012-11-10 2012-11-11 
+##       8334      12883       3219         NA         NA      12608 
+## 2012-11-12 2012-11-13 2012-11-14 2012-11-15 2012-11-16 2012-11-17 
+##      10765       7336         NA         41       5441      14339 
+## 2012-11-18 2012-11-19 2012-11-20 2012-11-21 2012-11-22 2012-11-23 
+##      15110       8841       4472      12787      20427      21194 
+## 2012-11-24 2012-11-25 2012-11-26 2012-11-27 2012-11-28 2012-11-29 
+##      14478      11834      11162      13646      10183       7047 
+## 2012-11-30 
+##         NA
+```
+
 To make a Histrogram of the total steps per day, I used the hist function in the base package.
-```{r, echo=TRUE}
+
+```r
 hist(steps_per_day, xlab = "Steps Per Day", main = "Histogram of Steps Per Day", col = "blue")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-4-1.png) 
+
 To find the mean and median steps per day, I moved the steps per day to a data and removed the NA values  
 
-```{r , echo=TRUE}
+
+```r
 spddf <- data.frame(steps_per_day)
 clean_spddf <- na.omit(spddf)
 ```
 
 Then I could run the mean and median function to find the mean and median 
-```{r, echo=TRUE}
+
+```r
 mean(clean_spddf$steps_per_day)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 median(clean_spddf$steps_per_day)
+```
+
+```
+## [1] 10765
 ```
 
 ##What is the average daily activity pattern?
@@ -55,18 +94,25 @@ To find the daily steps taken per interval averaged across all the days, I ran t
 I then combined the steps_per_interval object and the list of intervals into a data frame(z).  
 I then used the base plot system to plot the data.
 
-```{r, echo=TRUE}
 
+```r
 steps_per_interval <- tapply(steps, interval, mean)
 z <- cbind(unique(interval), steps_per_interval)
 
 plot(z, type ="l", ylab = "Average Steps", xlab = "Interval")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-7-1.png) 
+
 To find the interval that has the maximum average number of steps, I took a subset that returns the interval column (the first column in my data frame), and the row that equals the max value of column 2 in my data frame (the number of steps). 
 
-```{r, echo=TRUE}
+
+```r
 z[(z[,2] == max(z[,2])),1]
+```
+
+```
+## [1] 835
 ```
 I found the max interval minute to be 835 on average. 
 
@@ -76,9 +122,14 @@ To find the number of rows that have missing values, I returned to the original 
 I take a subset the uses is.na to create a data frame that only has rows contain missing values.  
 I then can take the nrow of the data frame to find the number of rows
 
-```{r, echo=TRUE}
+
+```r
 na <- data[(is.na(data)),]
 nrow(na)
+```
+
+```
+## [1] 2304
 ```
 
 I found there to be 2,304 rows with missing values. 
@@ -88,7 +139,8 @@ To replace the NA value with the daily mean, I ran a for loop which checks if th
 I then constructed a data set with the new step values (steps2) called data2. 
 
 
-```{r, echo=TRUE}
+
+```r
 steps2 <- c()
 for (i in 1:17568){
         if (is.na(data[i,1])){
@@ -111,11 +163,25 @@ steps_per_day2 <- tapply(steps2, date2, sum)
 hist(steps_per_day2, xlab = "Steps Per Day", main = "Histogram of Steps Per Day", col = "blue")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-10-1.png) 
+
 As one would expect, adding more values along the mean, pushes the median to the mean, and keeps the mean the same.  
 
-```{r, echo=TRUE}
+
+```r
 mean(steps_per_day2)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 median(steps_per_day2)
+```
+
+```
+## [1] 10766.19
 ```
 
 ##Are there differences in activity patterns between weekdays and weekends?
@@ -124,14 +190,16 @@ To find whether a day is a weekday or weekend I used the weekdays function as we
 
 I first created a variable called weekday which contains all the weekday days. I used %in% to apply a logical test. I then specified the levels and labels. I stored this function back into my data2 data set. 
 
-```{r, echo = TRUE}
+
+```r
 weekday <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
 data2$day_of_week <-  factor((weekdays(date2) %in% weekday)+1L, levels=1:2, labels=c('weekend', 'weekday'))
 ```
 
 Now that the data is in one place 
 
-```{r, echo=TRUE}
+
+```r
  weekdays <- data2[(data2$day_of_week == "weekday"),]
  weekend <- data2[(data2$day_of_week == "weekend"),]
 
@@ -154,8 +222,18 @@ data3 <- rbind(day_df, end_df)
 ```
 
 Finally, the plot of the Weekday averages and Weekend averages.
-```{r, echo=TRUE}
+
+```r
 library(lattice)
+```
+
+```
+## Warning: package 'lattice' was built under R version 3.1.3
+```
+
+```r
 xyplot(data3$average_steps~data3$interval| data3$day_of_week, layout = c(1,2), type= "l", xlab= "Interval", ylab="Average Steps")
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-14-1.png) 
 
